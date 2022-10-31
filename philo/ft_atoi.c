@@ -27,7 +27,7 @@ int	ft_atoi_loop(char *str, int *i, int *bool)
 		}
 		else
 			ft_error();
-		if (resulte > 2147483648)
+		if (resulte > 2147483647) //check this
 			ft_error();
 	}
 	return (resulte);

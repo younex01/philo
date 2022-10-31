@@ -15,7 +15,7 @@
 void	ft_error(void)
 {
 	write(2, "Error\n", 6);
-	exit(1);
+	return ; // check this
 }
 
 long long	get_time(void)
