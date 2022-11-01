@@ -15,7 +15,7 @@ SRC = philo.c linking_forks.c ft_atoi.c monitor.c philo_utils.c
 OBJS = ${SRC:.c=.o}
 CC = cc
 RM = rm -rf
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = #-Wall -Wextra -Werror
 
 all: $(NAME)
 

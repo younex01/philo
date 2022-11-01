@@ -83,8 +83,8 @@ void	create_philo(t_data_g	*data_g)
 	create_threads(philo);
 	pthread_create(&monitor, NULL, &routine, philo);
 	pthread_join(monitor, NULL);
-	//free(philo);
 	ft_destroy_mutex(philo);
+	free(philo);
 }
 
 int	main(int ac, char **av)
