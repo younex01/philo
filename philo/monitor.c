@@ -12,6 +12,29 @@
 
 #include "philo.h"
 
+void	ft_error(void)
+{
+	write(2, "Error\n", 6);
+	return ;
+}
+
+void	check_par(t_data_g *data)
+{
+	if (data->nb_of_philo <= 0)
+	{
+		if (data->nb_of_philo == 0)
+			ft_error();
+		data->par_check = 1;
+	}
+	if (data->time_to_die < 0)
+		data->par_check = 1;
+	if (data->time_to_eat < 0)
+		data->par_check = 1;
+	if (data->time_to_sleep < 0)
+		data->par_check = 1;
+	return ;
+}
+
 int	nb_of_times_must_eat(t_philo *p)
 {
 	int	i;
@@ -56,8 +79,11 @@ void	*routine(void *philo)
 	p = philo;
 	while (1)
 	{
-		if (!(nb_of_times_must_eat(p)))
-			return (NULL);
+		if (p->data->ac == 6)
+		{
+			if (!(nb_of_times_must_eat(p)))
+				return (NULL);
+		}
 		if (!(if_is_die(p)))
 			return (NULL);
 	}

@@ -26,9 +26,15 @@ int	ft_atoi_loop(char *str, int *i, int *bool)
 			(*i)++;
 		}
 		else
+		{
 			ft_error();
-		if (resulte > 2147483647) //check this
+			return (-1);
+		}
+		if (resulte > 2147483647)
+		{
 			ft_error();
+			return (-1);
+		}
 	}
 	return (resulte);
 }
@@ -44,11 +50,17 @@ int	ft_atoi(char *str)
 	if (str[i] == '+' || str[i] == '-')
 	{
 		if (str[i] == '-')
+		{
 			ft_error();
+			return (-1);
+		}
 		(i)++;
 	}
 	resulte = ft_atoi_loop(str, &(i), &bool);
 	if (!bool)
+	{
 		ft_error();
+		return (-1);
+	}
 	return (resulte);
 }

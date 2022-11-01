@@ -12,12 +12,6 @@
 
 #include "philo.h"
 
-void	ft_error(void)
-{
-	write(2, "Error\n", 6);
-	return ; // check this
-}
-
 long long	get_time(void)
 {
 	struct timeval	tv;
@@ -38,11 +32,11 @@ void	ft_usleep(unsigned long time)
 void	ft_print(const char *s, long long time, int i, t_philo *ph)
 {
 	(void)time;
- 	pthread_mutex_lock(&(ph->data->print_mutex));
-     if (ph->data->print_check)
-         return ;
- 	printf("%lld ms %d %s\n", get_time() - ph->data->time, i, s);
- 	pthread_mutex_unlock(&(ph->data->print_mutex));
+	pthread_mutex_lock(&(ph->data->print_mutex));
+	if (ph->data->print_check)
+		return ;
+	printf("%lld ms %d %s\n", get_time() - ph->data->time, i, s);
+	pthread_mutex_unlock(&(ph->data->print_mutex));
 }
 
 void	ft_destroy_mutex(t_philo *philo)
@@ -50,15 +44,12 @@ void	ft_destroy_mutex(t_philo *philo)
 	int	i;
 
 	i = 0;
-	pthread_mutex_destroy(&philo->data->print_mutex);
 	while (i < philo->data->nb_of_philo)
 	{
 		pthread_mutex_destroy(&philo[i].fork);
 		i++;
 	}
-	free(philo);
-    usleep(500);
- 	pthread_mutex_destroy(&philo->data->print_mutex);
+	pthread_mutex_destroy(&philo->data->print_mutex);
 }
 
 int	taking_forks(t_philo *p)
@@ -66,18 +57,22 @@ int	taking_forks(t_philo *p)
 	if (p->index % 2 == 0)
 	{
 		pthread_mutex_lock(&p->fork);
-		ft_print("has taken a fork", get_time() - p->data->time, p->index + 1, p);
+		ft_print("has taken a fork", get_time() - p->data->time,
+			p->index + 1, p);
 		if (! p->next_fork)
 			return (0);
 		pthread_mutex_lock(p->next_fork);
-		ft_print("has taken a fork", get_time() - p->data->time, p->index + 1, p);
+		ft_print("has taken a fork", get_time() - p->data->time,
+			p->index + 1, p);
 	}
 	else
 	{
 		pthread_mutex_lock(p->next_fork);
-		ft_print("has taken a fork", get_time() - p->data->time, p->index + 1, p);
+		ft_print("has taken a fork", get_time() - p->data->time,
+			p->index + 1, p);
 		pthread_mutex_lock(&p->fork);
-		ft_print("has taken a fork", get_time() - p->data->time, p->index + 1, p);
+		ft_print("has taken a fork", get_time() - p->data->time,
+			p->index + 1, p);
 	}
 	return (1);
 }

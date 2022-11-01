@@ -19,7 +19,7 @@ void	philo_init(t_philo *philo, t_data_g *data_g)
 	i = 0;
 	pthread_mutex_init(&data_g->print_mutex, NULL);
 	data_g->print_check = 0;
-    data_g->time = get_time();
+	data_g->time = get_time();
 	while (i < data_g->nb_of_philo)
 	{
 		pthread_mutex_init(&philo[i].fork, NULL);
@@ -37,15 +37,15 @@ void	*philo_routine(void *philo)
 	t_philo	*p;
 
 	p = (t_philo *)philo;
-		if (p->index % 2)
-			usleep(50);
+	if (p->index % 2)
+		usleep(50);
 	while (1)
 	{
 		if (!taking_forks(p))
 			break ;
 		p->last_eating_time = get_time();
 		ft_print("is eating", get_time() - p->data->time,
- 			p->index + 1, p);
+			p->index + 1, p);
 		p->nbr_eating++;
 		ft_usleep(p->data->time_to_eat);
 		pthread_mutex_unlock(&p->fork);
@@ -83,6 +83,7 @@ void	create_philo(t_data_g	*data_g)
 	create_threads(philo);
 	pthread_create(&monitor, NULL, &routine, philo);
 	pthread_join(monitor, NULL);
+	//free(philo);
 	ft_destroy_mutex(philo);
 }
 
@@ -90,20 +91,26 @@ int	main(int ac, char **av)
 {
 	t_data_g	data_g;
 
+	data_g.par_check = 0;
 	if (ac == 5 || ac == 6)
 	{
 		data_g.nb_of_philo = ft_atoi(av[1]);
-		if (!data_g.nb_of_philo)
-			ft_error();
 		data_g.time_to_die = ft_atoi(av[2]);
 		data_g.time_to_eat = ft_atoi(av[3]);
 		data_g.time_to_sleep = ft_atoi(av[4]);
+		check_par(&data_g);
+		if (data_g.par_check == 1)
+			return (0);
 		if (ac == 6)
 		{
 			data_g.nb_of_times_each_philo_must_eat = ft_atoi(av[5]);
+			if (data_g.nb_of_times_each_philo_must_eat <= 0)
+				return (0);
 			data_g.ac = 6;
 		}
 		create_philo(&data_g);
 	}
+	else
+		ft_error();
 	return (0);
 }

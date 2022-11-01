@@ -27,8 +27,9 @@ typedef struct s_data_g
 	int				nb_of_times_each_philo_must_eat;
 	pthread_mutex_t	print_mutex;
 	int				ac;
-	int             print_check;
- 	long long		time;
+	int				print_check;
+	long long		time;
+	int				par_check;
 }t_data_g;
 
 typedef struct s_philo
@@ -52,5 +53,6 @@ void		ft_print(const char *s, long long time, int i, t_philo *ph);
 void		ft_destroy_mutex(t_philo *philo);
 int			taking_forks(t_philo *p);
 void		ft_error(void);
+void		check_par(t_data_g *data);
 
 #endif
