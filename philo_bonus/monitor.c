@@ -39,8 +39,7 @@ int	if_is_die(t_philo *p)
 	{
 		if (get_time() - p[i].last_eating_time > p[i].data->time_to_die)
 		{
-			pthread_mutex_lock(&p[i].data->print_mutex);
-			p->data->print_check = 1;
+			sem_wait(p->data->print_sem);
 			printf("%lld ms %d is died\n",
 				get_time() - p->data->time, p[i].index + 1);
 			return (0);

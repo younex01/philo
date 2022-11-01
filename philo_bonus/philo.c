@@ -17,14 +17,14 @@ void	philo_init(t_philo *philo, t_data_g *data_g)
 	int	i;
 
 	i = 0;
-	pthread_mutex_init(&data_g->print_mutex, NULL);
-	data_g->print_check = 0;
-    data_g->time = get_time();
+	sem_unlink("forks");
+	sem_unlink("print");
+	data_g->print_sem = sem_open("print", O_CREAT, 0644, 1);
+	philo->fork = sem_open("forks", O_CREAT, 0644, data_g->nb_of_philo);
+	data_g->time = get_time();
 	while (i < data_g->nb_of_philo)
 	{
-		pthread_mutex_init(&philo[i].fork, NULL);
 		philo[i].nbr_eating = 0;
-		philo[i].next_fork = NULL;
 		philo[i].index = i;
 		philo[i].data = data_g;
 		philo[i].last_eating_time = get_time();
@@ -35,37 +35,47 @@ void	philo_init(t_philo *philo, t_data_g *data_g)
 void	*philo_routine(void *philo)
 {
 	t_philo	*p;
+	pthread_t	monitor;
 
 	p = (t_philo *)philo;
-		if (p->index % 2)
-			usleep(50);
+	pthread_create(&monitor, NULL, &routine, philo);
+	if (p->index % 2)
+		usleep(50);
 	while (1)
 	{
 		if (!taking_forks(p))
 			break ;
 		p->last_eating_time = get_time();
 		ft_print("is eating", get_time() - p->data->time,
- 			p->index + 1, p);
+				 p->index + 1, p);
 		p->nbr_eating++;
 		ft_usleep(p->data->time_to_eat);
-		pthread_mutex_unlock(&p->fork);
-		pthread_mutex_unlock(p->next_fork);
+		sem_post(p->fork);
+		sem_post(p->fork);
 		ft_print("is sleeping", get_time() - p->data->time, p->index + 1, p);
 		ft_usleep(p->data->time_to_sleep);
 		ft_print("is thinking", get_time() - p->data->time, p->index + 1, p);
 	}
+	pthread_join(monitor, NULL);
 	return (NULL);
 }
 
 void	create_threads(t_philo *philo)
 {
 	int	i;
+	int	id;
 
 	i = 0;
 	while (i < philo->data->nb_of_philo)
 	{
-		pthread_create(&philo[i].th, NULL, &philo_routine, &philo[i]);
-		pthread_detach(philo[i].th);
+		id = fork();
+		if (id == -1)
+			exit(EXIT_FAILURE);
+		if(id == 0)
+		{
+			pthread_create(&philo[i].th, NULL, &philo_routine, &philo[i]);
+			pthread_detach(philo[i].th);
+		}
 		i++;
 	}
 }
@@ -73,17 +83,13 @@ void	create_threads(t_philo *philo)
 void	create_philo(t_data_g	*data_g)
 {
 	t_philo		*philo;
-	pthread_t	monitor;
 
 	philo = malloc(data_g->nb_of_philo * sizeof(t_philo));
 	if (!philo)
 		return ;
 	philo_init(philo, data_g);
-	link_forks(philo);
 	create_threads(philo);
-	pthread_create(&monitor, NULL, &routine, philo);
-	pthread_join(monitor, NULL);
-	ft_destroy_mutex(philo);
+	ft_destroy_sem(philo);
 }
 
 int	main(int ac, char **av)
