@@ -6,7 +6,7 @@
 /*   By: yelousse <yelousse@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/28 05:31:00 by yelousse          #+#    #+#             */
-/*   Updated: 2022/08/28 15:04:11 by yelousse         ###   ########.fr       */
+/*   Updated: 2023/01/17 00:53:39 by yelousse         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct s_philo
 	int			index;
 	int			timestamp_in_ms;
 	t_data_g	*data;
+	int			id;
 }t_philo;
 
 int			ft_atoi(char *str);

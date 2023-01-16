@@ -6,7 +6,7 @@
 /*   By: yelousse <yelousse@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/28 05:44:06 by yelousse          #+#    #+#             */
-/*   Updated: 2022/08/28 15:03:54 by yelousse         ###   ########.fr       */
+/*   Updated: 2023/01/16 23:34:53 by yelousse         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,7 @@ void	ft_destroy_sem(t_philo *philo)
 
 	i = 0;
 	sem_close(philo->data->print_sem);
-	while (i < philo->data->nb_of_philo)
-	{
-		sem_close(philo[i].fork);
-		i++;
-	}
+	sem_close(philo->fork);
 	free(philo);
 }
 

@@ -6,41 +6,17 @@
 /*   By: yelousse <yelousse@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/22 21:00:22 by yelousse          #+#    #+#             */
-/*   Updated: 2022/08/28 15:06:35 by yelousse         ###   ########.fr       */
+/*   Updated: 2023/01/17 00:51:54 by yelousse         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	philo_init(t_philo *philo, t_data_g *data_g)
-{
-	int	i;
-
-	i = 0;
-	sem_unlink("forks");
-	sem_unlink("print");
-	data_g->print_sem = sem_open("print", O_CREAT, 0644, 1);
-	philo->fork = sem_open("forks", O_CREAT, 0644, data_g->nb_of_philo);
-	data_g->time = get_time();
-	while (i < data_g->nb_of_philo)
-	{
-		philo[i].nbr_eating = 0;
-		philo[i].index = i;
-		philo[i].data = data_g;
-		philo[i].last_eating_time = get_time();
-		i++;
-	}
-}
-
-void	*philo_routine(void *philo)
+void	philo_routine(t_philo *philo)
 {
 	t_philo	*p;
-	pthread_t	monitor;
 
 	p = (t_philo *)philo;
-	pthread_create(&monitor, NULL, &routine, philo);
-	if (p->index % 2)
-		usleep(50);
 	while (1)
 	{
 		if (!taking_forks(p))
@@ -56,29 +32,46 @@ void	*philo_routine(void *philo)
 		ft_usleep(p->data->time_to_sleep);
 		ft_print("is thinking", get_time() - p->data->time, p->index + 1, p);
 	}
-	pthread_join(monitor, NULL);
-	return (NULL);
 }
 
-void	create_threads(t_philo *philo)
+void	philo_init(t_philo *philo, t_data_g *data_g)
 {
 	int	i;
-	int	id;
+	int id;
+	pthread_t	monitor;
 
 	i = 0;
-	while (i < philo->data->nb_of_philo)
+	sem_unlink("forks");
+	sem_unlink("print");
+	data_g->print_sem = sem_open("print", O_CREAT, 0777, 1);
+	philo->fork = sem_open("forks", O_CREAT, 0777, data_g->nb_of_philo);
+	data_g->time = get_time();
+	while (i < data_g->nb_of_philo)
 	{
 		id = fork();
-		if (id == -1)
-			exit(EXIT_FAILURE);
 		if(id == 0)
 		{
-			pthread_create(&philo[i].th, NULL, &philo_routine, &philo[i]);
-			pthread_detach(philo[i].th);
+			philo[i].nbr_eating = 0;
+			philo[i].index = i;
+			philo[i].data = data_g;
+			philo[i].last_eating_time = get_time();
+			// create_threads(philo, i);
+			pthread_create(&monitor, NULL, &routine, philo);
+			philo_routine(philo);
+			break;
 		}
+		else
+			philo[i].id = id;
 		i++;
 	}
 }
+
+
+// void	create_threads(t_philo *philo, int i)
+// {
+	
+// 	// pthread_detach(philo[i].th);
+// }
 
 void	create_philo(t_data_g	*data_g)
 {
@@ -87,8 +80,10 @@ void	create_philo(t_data_g	*data_g)
 	philo = malloc(data_g->nb_of_philo * sizeof(t_philo));
 	if (!philo)
 		return ;
+	// philo->id = malloc(data_g->nb_of_philo * sizeof(int));
+	// if (!philo->id)
+	// 	return ;
 	philo_init(philo, data_g);
-	create_threads(philo);
 	ft_destroy_sem(philo);
 }
 
